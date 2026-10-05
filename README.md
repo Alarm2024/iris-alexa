@@ -145,3 +145,5 @@ Fixtures in `tests/fixtures.ts`: real scam lines, synthetic scam lines, normal l
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+Docs and images: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), © elghaly. Third-party fonts, logos and screenshots of other services keep their own licenses.

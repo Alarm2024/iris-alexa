@@ -9,7 +9,10 @@ import { createIrisServer } from "./mcp.js";
 export const MCP_PATH = "/mcp";
 /** The simulated Alexa+ page, served same-origin so a browser can post to /mcp without CORS. */
 export const SIM_PATH = "/sim";
-const SIM_PAGE = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../sim/alexa-page.html"), "utf8");
+const SIM_DIR = join(dirname(fileURLToPath(import.meta.url)), "../sim");
+const SIM_PAGE = readFileSync(join(SIM_DIR, "alexa-page.html"), "utf8");
+/** Deterministic utterance router. The sim page imports this same file. */
+const SIM_ROUTE_JS = readFileSync(join(SIM_DIR, "route.js"), "utf8");
 export const MCP_SPEC = "2025-11-25";
 /** Hard cap on a request body. Tool inputs are short strings; anything bigger is refused. */
 export const MAX_BODY_BYTES = 64 * 1024;
@@ -247,6 +250,11 @@ export function startServer(options: { host?: string; port?: number; env?: NodeJ
           read_only: true,
         }),
       );
+      return;
+    }
+    if (req.method === "GET" && path === `${SIM_PATH}/route.js`) {
+      res.writeHead(200, { "content-type": "text/javascript; charset=utf-8", "cache-control": "no-store" });
+      res.end(SIM_ROUTE_JS);
       return;
     }
     if (req.method === "GET" && path === SIM_PATH) {

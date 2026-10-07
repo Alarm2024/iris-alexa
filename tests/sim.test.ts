@@ -43,6 +43,23 @@ describe("/sim page", () => {
     assert.doesNotMatch(rendered.text, /undefined/);
   });
 
+  it("shows a refusal summary, not the raw JSON", () => {
+    const rendered = renderReply(
+      toolReply(
+        {
+          refused: true,
+          reason: "seed_phrase",
+          warning: "long warning",
+          summary: "Refused: that looks like a seed phrase, and this server will not handle it.",
+        },
+        true,
+      ),
+    );
+    assert.equal(rendered.error, true);
+    assert.equal(rendered.text, "Error: Refused: that looks like a seed phrase, and this server will not handle it.");
+    assert.doesNotMatch(rendered.text, /\{/);
+  });
+
   it("shows a JSON-RPC error as an error", () => {
     const rendered = renderReply({ jsonrpc: "2.0", id: 1, error: { code: -32602, message: "Invalid params" } });
     assert.deepEqual(rendered, { error: true, text: "Error: Invalid params" });
@@ -63,5 +80,16 @@ describe("/sim page", () => {
     const options = [...PAGE.matchAll(/<option value="([a-z_]+)">/g)].map((m) => m[1]);
     assert.deepEqual(options, [...TIP_TOPICS]);
     assert.match(PAGE, /if \(tool === "safety_tip"\) args\.topic = topicSelect\.value;/);
+  });
+
+  it("holds to talk with the Web Speech API and routes the words", () => {
+    assert.match(PAGE, /window\.SpeechRecognition \|\| window\.webkitSpeechRecognition/);
+    assert.match(PAGE, /rec\.lang = "en-US"/);
+    assert.match(PAGE, /import \{ route \} from "\/sim\/route\.js"/);
+    assert.match(PAGE, /id="mic" hidden/);
+    assert.match(PAGE, /mic\.hidden = true/);
+    assert.match(PAGE, /const call = route\(text\)/);
+    assert.match(PAGE, /callTool\(call\.name, call\.arguments, true\)/);
+    assert.match(PAGE, /speechSynthesis\.speak\(new SpeechSynthesisUtterance/);
   });
 });

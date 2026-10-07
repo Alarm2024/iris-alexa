@@ -296,6 +296,13 @@ describe("/mcp hardening", () => {
     assert.match(reply.body, /fetch\("\/mcp"/);
   });
 
+  it("serves the utterance router next to the simulated page", async () => {
+    const reply = await send(port, { path: "/sim/route.js", method: "GET" });
+    assert.equal(reply.status, 200);
+    assert.match(String(reply.headers["content-type"]), /javascript/);
+    assert.match(reply.body, /export function route/);
+  });
+
   it("keeps /health free of user data", async () => {
     const reply = await send(port, { path: "/health", method: "GET" });
     assert.equal(reply.status, 200);

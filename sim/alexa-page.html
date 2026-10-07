@@ -11,6 +11,9 @@
   textarea { width: 100%; min-height: 5rem; font: inherit; padding: .5rem; box-sizing: border-box; }
   .row { display: flex; flex-wrap: wrap; gap: .5rem; margin: .75rem 0; }
   button { font: inherit; padding: .5rem .9rem; cursor: pointer; }
+  #mic { touch-action: none; user-select: none; }
+  #mic[hidden] { display: none; }
+  #mic[aria-pressed="true"] { outline: 3px solid currentColor; }
   #spoken { border-left: 4px solid #888; padding: .75rem 1rem; margin-top: 1rem; min-height: 3rem; white-space: pre-wrap; }
   #spoken.error { border-left-color: #c0392b; }
   select { font: inherit; padding: .4rem; }
@@ -21,10 +24,11 @@
 <body>
 <p><strong>Simulated Alexa+ page — not a real Alexa device</strong></p>
 <h1>iris-alexa</h1>
-<p><small>A stand-in for an MCP host. It posts the same JSON-RPC an MCP host sends to <code>/mcp</code> and reads the text back. Read-only. Nothing is stored. Do not type a seed phrase.</small></p>
+<p><small>A stand-in for an MCP host. Hold the mic to talk, or type and pick a tool. It posts the same JSON-RPC an MCP host sends to <code>/mcp</code> and reads the text back. Read-only. Nothing is stored. Do not type a seed phrase.</small></p>
 
 <textarea id="input" placeholder="Paste a message, a link, or a public Solana signature"></textarea>
 <div class="row">
+  <button type="button" id="mic" hidden aria-pressed="false">hold to talk</button>
   <button data-tool="check_scam" data-arg="situation">check_scam</button>
   <button data-tool="check_link" data-arg="url">check_link</button>
   <button data-tool="explain_transaction" data-arg="signature">explain_transaction</button>
@@ -72,18 +76,26 @@
     let payload = null;
     try { payload = JSON.parse(first); } catch { payload = null; }
     if (result.isError) {
-      const message = payload && payload.message ? payload.message : first || "the tool returned an error.";
+      const message =
+        (payload && payload.message) ||
+        (payload && payload.summary) ||
+        (payload && payload.warning) ||
+        first ||
+        "the tool returned an error.";
       return { error: true, text: `Error: ${message}` };
     }
     if (!payload) return { error: true, text: "Error: the reply could not be read." };
     return { error: false, text: toSpeech(payload) };
   }
 </script>
-<script>
+<script type="module">
+  import { route } from "/sim/route.js";
+
   const spoken = document.getElementById("spoken");
   const raw = document.getElementById("raw");
   const input = document.getElementById("input");
   const topicSelect = document.getElementById("topic");
+  const mic = document.getElementById("mic");
   let id = 1;
 
   async function rpc(method, params) {
@@ -113,8 +125,27 @@
     spoken.setAttribute("role", rendered.error ? "alert" : "status");
   }
 
+  function speakSummary(text) {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+  }
+
+  async function callTool(tool, args, speakIt) {
+    show({ error: false, text: "…" });
+    try {
+      const reply = await rpc("tools/call", { name: tool, arguments: args });
+      raw.textContent = JSON.stringify(reply, null, 2);
+      const rendered = globalThis.renderReply(reply);
+      show(rendered);
+      if (speakIt) speakSummary(rendered.text);
+    } catch (error) {
+      show({ error: true, text: `Error: ${error && error.message ? error.message : error}` });
+    }
+  }
+
   for (const button of document.querySelectorAll("button[data-tool]")) {
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", () => {
       const tool = button.dataset.tool;
       const value = input.value.trim();
       const args = {};
@@ -122,20 +153,73 @@
       if (tool === "safety_tip") args.topic = topicSelect.value;
       else if (tool === "clean_up_steps") args.target = value || "wallet";
       else args[button.dataset.arg] = value;
-      show({ error: false, text: "…" });
-      try {
-        const reply = await rpc("tools/call", { name: tool, arguments: args });
-        raw.textContent = JSON.stringify(reply, null, 2);
-        const rendered = renderReply(reply);
-        show(rendered);
-        if (!rendered.error && document.getElementById("speak").checked && "speechSynthesis" in window) {
-          speechSynthesis.cancel();
-          speechSynthesis.speak(new SpeechSynthesisUtterance(rendered.text));
-        }
-      } catch (error) {
-        show({ error: true, text: `Error: ${error && error.message ? error.message : error}` });
-      }
+      const speakIt = document.getElementById("speak").checked;
+      void callTool(tool, args, speakIt);
     });
+  }
+
+  // Hold to talk. Browser Web Speech API, en-US. No key. Missing API: hide the mic.
+  const SpeechApi = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechApi) {
+    mic.hidden = true;
+  } else {
+    mic.hidden = false;
+    const rec = new SpeechApi();
+    rec.lang = "en-US";
+    rec.continuous = true;
+    rec.interimResults = true;
+    let holding = false;
+    let heard = "";
+
+    const press = (event) => {
+      event.preventDefault();
+      holding = true;
+      heard = "";
+      mic.setAttribute("aria-pressed", "true");
+      if (event.pointerId !== undefined) {
+        try { mic.setPointerCapture(event.pointerId); } catch { /* the button can still hear pointerup */ }
+      }
+      try { rec.start(); } catch { /* already listening */ }
+    };
+    const release = () => {
+      if (!holding) return;
+      holding = false;
+      mic.setAttribute("aria-pressed", "false");
+      try { rec.stop(); } catch { /* already stopped */ }
+    };
+
+    mic.addEventListener("pointerdown", press);
+    mic.addEventListener("pointerup", release);
+    mic.addEventListener("pointercancel", release);
+    mic.addEventListener("contextmenu", (event) => event.preventDefault());
+    mic.addEventListener("keydown", (event) => {
+      if ((event.key === " " || event.key === "Enter") && !holding) press(event);
+    });
+    mic.addEventListener("keyup", (event) => {
+      if (event.key === " " || event.key === "Enter") release();
+    });
+
+    rec.onresult = (event) => {
+      let said = "";
+      for (let i = 0; i < event.results.length; i++) said += event.results[i][0].transcript;
+      heard = said.trim();
+      if (heard) input.value = heard;
+    };
+    rec.onerror = (event) => {
+      if (!event || event.error === "aborted" || event.error === "no-speech") return;
+      show({ error: true, text: `Error: speech recognition ${event.error}` });
+    };
+    rec.onend = () => {
+      if (holding) {
+        try { rec.start(); } catch { /* restart while the button is held */ }
+        return;
+      }
+      const text = heard.trim();
+      heard = "";
+      if (!text) return;
+      const call = route(text);
+      void callTool(call.name, call.arguments, true);
+    };
   }
 </script>
 </body>

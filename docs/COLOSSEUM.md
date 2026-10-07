@@ -50,3 +50,7 @@ Push copies under `docs/media/` when uploading to GitHub so the submission links
 - `docs/DEVPOST.md` — Alexa+ / Devpost narrative  
 - `docs/FRICTION_LOG.md` — build friction notes  
 
+## YouTube (Unlisted)
+
+- Demo: https://youtu.be/fj_CTDCyNsc
+- Pitch: https://youtu.be/8mVTWrI32zQ

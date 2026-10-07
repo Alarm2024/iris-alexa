@@ -10,7 +10,7 @@
 | Piece | Repo | Notes |
 |-------|------|--------|
 | Voice / MCP /sim | https://github.com/elghaly-dev/iris-alexa | Main Colosseum entry surface |
-| Android APK | https://github.com/Alarm2024/iris-mobile | APK **v0.1.0** live; demo-video workflow on main after #4 |
+| Android APK | https://github.com/Alarm2024/iris-mobile | APK **v0.1.0** released ([release page](https://github.com/Alarm2024/iris-mobile/releases/tag/v0.1.0)); CI demo recording on the [demo-video release](https://github.com/Alarm2024/iris-mobile/releases/tag/demo-video) |
 | Web triage page | https://iris-35.elghaly.dev | Read-only; public RPC; no wallet connect / no keys |
 
 ## What judges should open
@@ -18,7 +18,7 @@
 1. **Repo:** https://github.com/elghaly-dev/iris-alexa  
 2. **Sim (voice/text stand-in for MCP host):** run locally → open `/sim` (hold-to-talk Web Speech when available; text box always works)  
 3. **APK:** iris-mobile release **v0.1.0**  
-4. **Live page:** https://iris-35.elghaly.dev  
+4. **Web page:** https://iris-35.elghaly.dev  
 
 ## Honest scope
 
@@ -29,8 +29,6 @@
 
 ## Media (upload to Colosseum + YouTube Unlisted)
 
-Local build folder (on Bot box): `/workspace/colosseum-iris/`
-
 - `iris-demo.mp4` — product demo  
 - `iris-pitch.mp4` — ~2.5 min pitch  
 - Scripts: `demo-script.md`, `pitch-script.md`  
@@ -39,9 +37,10 @@ Push copies under `docs/media/` when uploading to GitHub so the submission links
 
 ## Checklist before submit (Sat Oct 11 UTC)
 
-- [ ] iris-mobile demo-video PR merged (#4 done 2026-10-07)  
-- [ ] iris-alexa voice-router (#6) reviewed / merged or linked as draft with green tests  
-- [ ] Demo + pitch videos Unlisted on YouTube; URLs pasted into Colosseum  
+- [x] iris-mobile demo-video PR merged (#4, 2026-10-07 UTC)  
+- [x] iris-alexa voice-router (#6) merged (2026-10-07 UTC)  
+- [x] Demo + pitch videos Unlisted on YouTube (links below)  
+- [ ] Same two URLs pasted into the Colosseum form  
 - [ ] Team / contact / Demo Day row filled if required  
 - [ ] Public times in **UTC only** on any post or event text  
 

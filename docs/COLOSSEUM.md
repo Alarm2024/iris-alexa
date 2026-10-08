@@ -9,16 +9,17 @@
 
 | Piece | Repo | Notes |
 |-------|------|--------|
-| Voice / MCP /sim | https://github.com/elghaly-dev/iris-alexa | Main Colosseum entry surface |
-| Android APK | https://github.com/Alarm2024/iris-mobile | APK **v0.1.0** live; demo-video workflow on main after #4 |
-| Web triage page | https://iris-35.elghaly.dev | Read-only; public RPC; no wallet connect / no keys |
+| **Main entry: Iris (iris-35)** | https://iris-35.elghaly.dev · repo https://github.com/elghaly-dev/iris-35 | Free, phone-first, read-only safety triage; public RPC; never connects a wallet, never asks for keys or seed phrases. Iris page (iPhone + Android checklists), chain read (Solana / Bitcoin / Ethereum, seed phrases refused), Ask IRIS with offline answers in six languages, Solana decoder (54 tests on 6 mainnet fixtures), voice desk on AssemblyAI |
+| Voice / MCP / /sim surface | https://github.com/elghaly-dev/iris-alexa | Voice / MCP / `/sim` surface |
+
+**Also built:** iris-mobile — Android voice app, APK **v0.1.0** · https://github.com/Alarm2024/iris-mobile
 
 ## What judges should open
 
-1. **Repo:** https://github.com/elghaly-dev/iris-alexa  
-2. **Sim (voice/text stand-in for MCP host):** run locally → open `/sim` (hold-to-talk Web Speech when available; text box always works)  
-3. **APK:** iris-mobile release **v0.1.0**  
-4. **Live page:** https://iris-35.elghaly.dev  
+1. **Main entry (iris-35):** https://iris-35.elghaly.dev  
+2. **Repo:** https://github.com/elghaly-dev/iris-alexa  
+3. **Sim (voice/text stand-in for MCP host):** run locally → open `/sim` (hold-to-talk Web Speech when available; text box always works)  
+4. **APK:** iris-mobile release **v0.1.0**  
 
 ## Honest scope
 

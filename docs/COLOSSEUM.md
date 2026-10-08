@@ -1,7 +1,7 @@
 # Iris Desk Voice — Colosseum Solana World’s Fair
 
 **Track:** Solana / Crypto World’s Fair  
-**Product:** Iris Desk Voice — read-only Solana safety triage (link check, tx explain, scam patterns, cleanup steps)  
+**Product:** Iris — free, read-only Solana safety triage. Main entry: https://iris-35.elghaly.dev  
 **Owner plan:** Submit **Sat Oct 11 UTC** (hard before **Mon Oct 13 ~06:59 UTC**)  
 **Public person:** Wyndham Heaven · **Company:** elghaly · **Site:** https://elghaly.dev  
 
@@ -9,7 +9,7 @@
 
 | Piece | Repo | Notes |
 |-------|------|--------|
-| **Main entry: Iris (iris-35)** | https://iris-35.elghaly.dev · repo https://github.com/elghaly-dev/iris-35 | Free, phone-first, read-only safety triage; public RPC; never connects a wallet, never asks for keys or seed phrases. Iris page (iPhone + Android checklists), chain read (Solana / Bitcoin / Ethereum, seed phrases refused), Ask IRIS with offline answers in six languages, Solana decoder (54 tests on 6 mainnet fixtures), voice desk on AssemblyAI |
+| **Main entry: Iris (iris-35)** | https://iris-35.elghaly.dev · repo https://github.com/elghaly-dev/iris-35 | Free, phone-first, read-only safety triage; public RPC; never connects a wallet, never asks for keys or seed phrases. Iris page (iPhone + Android checklists), chain read (Solana / Bitcoin / Ethereum, seed phrases refused), Ask IRIS with offline answers in six languages, Solana decoder (52 tests on 6 mainnet fixtures), voice desk on AssemblyAI |
 | Voice / MCP / /sim surface | https://github.com/elghaly-dev/iris-alexa | Voice / MCP / `/sim` surface |
 
 **Also built:** iris-mobile — Android voice app, APK **v0.1.0** · https://github.com/Alarm2024/iris-mobile

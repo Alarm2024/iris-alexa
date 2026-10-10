@@ -85,7 +85,7 @@ cp .env.example .env   # optional
 npm start
 ```
 
-Listens on `0.0.0.0:$PORT` (default port `3000`). `.env` is read with `process.loadEnvFile()`.
+Listens on `127.0.0.1:$PORT` by default (port `3000`); set `HOST=0.0.0.0` to accept outside connections, as `render.yaml` does. `.env` is read with `process.loadEnvFile()`.
 
 | URL | Purpose |
 | --- | --- |
@@ -105,6 +105,7 @@ Listens on `0.0.0.0:$PORT` (default port `3000`). `.env` is read with `process.l
 | `Content-Type` not `application/json` | `415` |
 | Body over 64 KB, declared or streamed | `413` |
 | Body that is not JSON | `400` |
+| A JSON array (batch) from a client that sends `MCP-Protocol-Version` 2025-06-18 or later | `400`. Batches were removed in 2025-06-18. |
 | `notifications/initialized` | `202`, no body |
 
 Every error body is fixed text. Nothing from the request, and no exception message, is echoed back.
@@ -137,7 +138,6 @@ npx mcp-inspector --cli http://127.0.0.1:3000/mcp --transport http \
 - **Five tools.** `explain_transaction`, `check_scam`, `check_link`, `safety_tip`, `clean_up_steps`.
 - **Hardened `/mcp`.** Host and Origin checks, 405 on GET and DELETE, 406 unless Accept lists both `application/json` and `text/event-stream`, 400 for an unknown `MCP-Protocol-Version`, 415 for a non-JSON body, 413 over 64 KB, 202 for `notifications/initialized`, and error bodies of fixed text.
 - **Voice `/sim`.** Hold to talk on the simulated page, through the browser Web Speech API. `sim/route.js` maps the utterance to one tool call with fixed rules and no model, in this order: a URL or domain → `check_link`, an 87- or 88-character base58 signature → `explain_transaction`, "tip" or "remind me" → `safety_tip`, "clean up" or "I got hacked" with iphone, android, or wallet → `clean_up_steps`, and anything else → `check_scam`. The page posts that `tools/call` to `/mcp`, shows the result, and speaks the `summary`. A seed phrase is sent through, and the server refuses it. The page is a stand-in for an MCP host.
-- **Agent Skill (P2).** A priority-2 skill for an agent host: follow those same fixed rules, call one of the five tools, and read the `summary`.
 
 ## Tests
 

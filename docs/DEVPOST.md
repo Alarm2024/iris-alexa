@@ -48,7 +48,7 @@ A clean result says "This is not a clearance."
 - **Privacy:** the server stores nothing and doesn't log tool arguments.
 - **Testing:** we had no Alexa+ host to test on. We tested with MCP Inspector in CLI mode, plus a simulated assistant page at `/sim`. That page sends the same JSON-RPC calls a host sends, shows the text an assistant would say, and can speak it through the browser's speech API. Hold to talk uses the browser Web Speech API. A deterministic router (`sim/route.js`, no model) picks the tool.
 - **Voice `/sim`:** hold to talk, then one `tools/call`. The router checks a URL or domain, then an 87- or 88-character base58 signature, then "tip" / "remind me", then "clean up" / "I got hacked" with a phone or a wallet, and otherwise `check_scam`. A seed phrase is not blocked on the page. The server refuses it.
-- **Tests:** 259, all passing. They cover real and synthetic scam lines, normal lines, refusals, bypass attempts, reported and official domains, every row of the `/mcp` table, and the utterance router.
+- **Tests:** 262, all passing. They cover real and synthetic scam lines, normal lines, refusals, bypass attempts, reported and official domains, every row of the `/mcp` table, and the utterance router.
 
 ## What we built during the hackathon window (Aug 31 – Oct 23)
 
@@ -56,7 +56,6 @@ A clean result says "This is not a clearance."
 - **Five tools.** `explain_transaction`, `check_scam`, `check_link`, `safety_tip`, `clean_up_steps`.
 - **Hardened `/mcp`.** Host and Origin checks, 405 on GET and DELETE, 406 unless Accept lists both `application/json` and `text/event-stream`, 400 for an unknown `MCP-Protocol-Version`, 415 for a non-JSON body, 413 over 64 KB, 202 for `notifications/initialized`, and error bodies of fixed text.
 - **Voice `/sim`.** Hold to talk on the simulated page, through the browser Web Speech API (`en-US`). The router maps the utterance to one tool. The page posts that `tools/call` to `/mcp`, shows the result, and speaks the `summary`. The page is a stand-in for an MCP host. No Amazon or Alexa logos or sounds.
-- **Agent Skill (P2).** A priority-2 skill for an agent host: follow the same fixed rules, call one of the five tools, and read the `summary`.
 
 ## Challenges we ran into
 - **Two kinds of error.** A tool can fail (`isError: true` inside a normal result), or the request can fail (a JSON-RPC error). Our own test page first showed a tool error as an ordinary answer. We fixed the page and added a test, so a host-style client shows both kinds as errors.
@@ -69,7 +68,7 @@ A clean result says "This is not a clearance."
 - Nothing in the code can sign, send, connect or approve, because there is no code path for it.
 - A pasted seed phrase is refused before any rule reads it. It is never sent to the RPC, never stored and never logged.
 - Every error body is fixed text, so nothing a caller sends is echoed back.
-- 259 tests pass, and a banned-word check runs on the README, source, tests and sim page.
+- 262 tests pass, and a banned-word check runs on the README, source, tests and sim page.
 
 ## What we learned
 - Streamable HTTP is small but exact: the Accept header, the status codes, `202` for notifications, and the protocol-version header all matter. A host and a server that disagree fail quietly.

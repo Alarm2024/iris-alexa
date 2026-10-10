@@ -3,6 +3,7 @@ import { request, type Server } from "node:http";
 import { after, before, describe, it } from "node:test";
 import {
   acceptsMcp,
+  batchAllowed,
   hostnameOf,
   isHostAllowed,
   isOriginAllowed,
@@ -120,6 +121,13 @@ describe("header helpers", () => {
     assert.equal(acceptsMcp(undefined), false);
   });
 
+  it("allows a batch before 2025-06-18 and refuses it from then on", () => {
+    assert.equal(batchAllowed(undefined), true);
+    assert.equal(batchAllowed("2025-03-26"), true);
+    assert.equal(batchAllowed("2025-06-18"), false);
+    assert.equal(batchAllowed("2025-11-25"), false);
+  });
+
   it("accepts a missing or supported MCP-Protocol-Version and rejects an unknown one", () => {
     assert.equal(protocolVersionOk(undefined), true);
     assert.equal(protocolVersionOk("2025-11-25"), true);
@@ -165,6 +173,17 @@ describe("/mcp hardening", () => {
   it("answers DELETE /mcp with 405", async () => {
     const reply = await send(port, { method: "DELETE" });
     assert.equal(reply.status, 405);
+  });
+
+  it("rejects a JSON-RPC batch from a 2025-11-25 client with 400", async () => {
+    const reply = await send(port, { body: `[${TOOLS_LIST}]` });
+    assert.equal(reply.status, 400, reply.body);
+    assert.match(reply.body, /one JSON-RPC message per request/);
+  });
+
+  it("leaves a batch from a client with no version header to the SDK", async () => {
+    const reply = await send(port, { body: `[${TOOLS_LIST}]`, headers: { "mcp-protocol-version": null } });
+    assert.notEqual(reply.status, 400, reply.body);
   });
 
   it("rejects an Accept header without text/event-stream with 406", async () => {

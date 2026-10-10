@@ -41,7 +41,7 @@ Copies under `docs/media/` (`iris-demo.mp4`, `iris-pitch.mp4`; scripts in `demo-
 - Demo: https://youtu.be/fj_CTDCyNsc  
 - Pitch: https://youtu.be/8mVTWrI32zQ  
 
-## Checklist before submit (Sat Oct 11 UTC)
+## Checklist before submit (deadline Tue Oct 13, 06:59 UTC)
 
 - [ ] iris-mobile **v0.1.0** APK linked in Colosseum  
 - [ ] Demo + pitch videos Unlisted on YouTube; URLs pasted into Colosseum  
